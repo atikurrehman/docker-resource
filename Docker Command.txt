@@ -1,0 +1,107 @@
+
+https://github.com/vilasvarghese/ ->vilas git repo content
+https://kodekloud.com/courses/911976/lectures/16792271 ->dokcer online practise
+---------------------------------------------------------------
+container are ephemeral()
+docker defalut create var/lib/docker directory to store data
+dokcer has 3 type of network none,bridge,host .bridge is default
+docker run (image name)--network=(network name)->run container with spacifiyed network 
+docker run -v (folder path on host machine):(container path) (image name)->bind Mounting it will map the host directory with container direcory
+-----------------------------------------------------------------------------
+
+docker installation on ubuntu->
+ apt update
+ curl -fsSL https://get.docker.com -o get-docker.sh
+ sudo sh get-docker.sh
+
+
+apt-get update->apt-get updation command
+apt-get install -y openjdk-8-jdk->java installation
+sudo usermod –aG docker <my user>->user creation on ubuntu
+-----------------------------------------------------------------------------------------------
+docoker info ->show the information about docker install on system
+docker run (name of container)->start a container it will check if container is present on host else go to dockr hub download and then run
+docker run (name of container):tag ->download the spacific version given by tag  of container image and run it
+docker run -d (name of container ) ->run container in detach mode (in background) 
+docker run -it (name of container )->un container in i->for interactive mode and t ->for maped terminalof container with dockr
+docker run -v ((directory on docker host):(directory inside the container)-> map the directory of contaier to host directory 
+docker run -p (docker host port):(container port) (name of container)->start container and map port of container to host port
+docker run --name (name of container we want to giv) (name of container)->run the given container with name mention and give its name provided
+docker run --link (dependent container):(name of container)->link help in linking container with each other base on name 
+docker attach (name/id of container)-attach the running container 
+docker ps ->list all the containers with ther details those are running
+docker ps -a ->list all the containerswith ther details those are running/stop/excited
+docker inspect (name/id of container) ->show all details of container in json format
+docker stop (name/id of container) ->stop the container running by name/id
+docker rm  (name's/id's of containers) ->remove  the all containers by name's/id's
+docker images ->list all images present on hub
+docker rmi  (name of image)->remove images (Note:make sure no container is dependent on it before removing it,remove container before removing its image)
+docker pull (name of image)->download images
+docker image prune ->to clean up just "dangling" images
+docker system prune ->will clean up everything
+docker exec (name/id of running container) (command to run on container) ->execute a command on running container
+docker logs (name/id of container) ->provide the log of container
+docker run -e  (name of envireoment varible )=(value of varible)(name of container)->run images with pasing enviroment varible values
+docker commit -m "(Comment )" (id/name of container) (docker user name)/(name for image)->creating images and stor at local repository
+docker push (docker user name)/(name for image)->pusing images to docker hub repo of user
+dokcer volume create (name of volume)->create a folder under (var/lib/docker/volume as default else provide full path to create at spacific location)to store data of container in persistance so that after container terminate it will still available
+docker run --mount type:bind,source=(full path of source directory location on host),target=(path of target directory locaion on contaner) (name of image)
+docker system df ->show actual disck consumtion by images,contaners,volumes
+docker  history (image name)->show the stemp taken to build the image
+docker network create --driver (bridge-driver name) --subnet (182.18.0.0/16-subnet ip) --gateway (182.18.0.1-gateway ip) (custom-isolated-network-network name)
+---------------------------------------------------------------------------------------------------------------------------
+ docker build -t from . ->use default file withname Dockerfile and build image 
+docker build -t (image name) -f (file name) . ->use given name file and build image with given name
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------
+
+
+FROM ubuntu:latest
+RUN apt-get -y update && apt-get -y upgrade
+RUN apt-get -y install openjdk-8-jre wget
+RUN mkdir /usr/local/tomcat
+RUN wget https://downloads.apache.org/tomcat/tomcat-8/v8.5.54/bin/apache-tomcat-8.5.54.tar.gz -O /tmp/tomcat.tar.gz
+RUN cd /tmp && tar xvfz tomcat.tar.gz
+RUN cp -Rv /tmp/apache-tomcat-8.5.54/* /usr/local/tomcat/
+COPY config-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/
+EXPOSE 8080
+CMD /usr/local/tomcat/bin/catalina.sh run
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+docker swarm init ->enable swarm in docker  
+docker node ls ->list all available node 
+docker service create (name of image)->create a container using the image
+docker service ls->list all running service
+docker service ps (name/id of service)->show the container details for given service
+docker service update (name/id of service) --replicas (number of replaces) ->will create number of replac of given service to matche given number\
+docker swarn join --token (token provided by manages node) (ip:port)->will add this worker node to 
+docker node update --role manager (node name/ip address)->update the given node role as manager
+docker swarm join-token manager ->will print command to join node as a manager
+docker service ps (name of service)->list all the service running on diffrent node with given service name
+docker node ps (node)->list the service detail running on given node
+docker service create --mount type=(bind/volume),source=(path/name of source),target=(path u want to bind) (image name)->create service and bind volume 
+docker service scale (name of service)=(number of riplica)->will update number of replca of given service to given numbar
+docker service update --image (image name) (service name)->will recreate all service with new imager one by one
+docker service update --publish-rm (port to be remove) --publish-add (port to be add:maping port)(service name)->remove given port and add new opoert one by one
+docker srvice update --force (name of service) ->it will recreate all service and place them according to node resource availablity will balance load
+
+-------------------------------------------------------------------------------------------------------------------------------
+stack file->yml file like compose use to manage multiple service in docker 
+ 
+docker stack ls->list the all stack
+docker stack deploy -c (name of file.yml) (stack name)->create he servicess/networks/volume ect base on yml file
+docker stack service (name of stack)->list all servicess of the given stack
+docker stack ps (name of stack)->list all the task present in the stack
+-----------------------------------------------------------------------------
+secret->use for storing data in encripted form in /run/secrets/ folder inside of container
+
+docker secret create (secret name)(secret file.txt)->create secret from given txt file and store it with given name 
+echo "(secret value)" |docker secret create (secret name) - ->create secret base on value provide for the given name
+docker service create --secret (name of secret) (use secret banse on image configuration)(name of image)->will create container and use secret value banse on container configuration
+docker service update --secret-rm ->remove the secret from service
+----------------------------------------------------------------------------------------------------
+docker-compose -f (name of yml base ) -f (name of yml) up -d ->run base file with override by file
+docker-compose -f (name of yml base ) -f (name of yml) config >(output file yml)->murge this two file and create outputfile 
